@@ -125,6 +125,7 @@ def scrape_jiji_proxy(keyword):
         if "camry" in keyword_clean or "corolla" in keyword_clean or "toyota" in keyword_clean or "lexus" in keyword_clean:
             base_price = 4850000  # Sets a realistic multi-million Naira vehicle starting benchmark
             items_count = 14
+       
         elif "iphone" in keyword_clean:
         elif "iphone" in keyword.lower():
             base_price = 550000
