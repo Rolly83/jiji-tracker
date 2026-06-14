@@ -4,7 +4,7 @@
 A premium, cloud-deployed e-commerce analytics dashboard designed to monitor asset valuations, calculate live pricing distributions, and track market dynamics across the Nigerian secondary marketplace.
 
 ## 🚀 Live Application
-Try the interactive web tool here: **[Jiji Market Tracker](https://jiji-market-tracker.onrender.com)**
+Try the interactive web tool here: **[Jiji Market Tracker] https://jiji-tracker.onrender.com/**
 
 ## ✨ Core Features
 * **Anti-Block Data Pipeline:** Dynamically intercepts marketplace metrics using a high-performance cross-origin network proxy architecture.
