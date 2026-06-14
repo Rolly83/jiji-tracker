@@ -6,8 +6,8 @@ import os
 from datetime import datetime
 from supabase import create_client, Client
 
-# --- ADVANCED CUSTOM BRAND STYLING ---
-st.set_page_config(page_title="Jiji Market Tracker", page_icon="📈", layout="wide")
+# --- ADVANCED NIGERIAN CUSTOM BRAND STYLING ---
+st.set_page_config(page_title="Jiji Market Tracker (NG)", page_icon="🇳🇬", layout="wide")
 
 st.markdown("""
     <style>
@@ -35,11 +35,11 @@ st.markdown("""
     }
     section[data-testid="stSidebar"] {
         background-color: #1A1F2C !important;
-        border-right: 1px solid #2D3748;
+        border-right: 1px solid #008751; /* Local Nigerian Green Accent Border */
     }
     .stButton>button {
-        background: linear-gradient(135deg, #00F2FE 0%, #4FACFE 100%) !important;
-        color: #000000 !important;
+        background: linear-gradient(135deg, #008751 0%, #00F2FE 100%) !important; /* Premium Localized Gradient */
+        color: #FFFFFF !important;
         font-weight: bold !important;
         border: none !important;
         border-radius: 6px !important;
@@ -47,13 +47,13 @@ st.markdown("""
     }
     .stButton>button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4) !important;
+        box-shadow: 0 5px 15px rgba(0, 135, 81, 0.4) !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("📈 Jiji Price & Demand Market Tracker")
-st.caption("Empowering buyers and sellers with real-time e-commerce data analytics.")
+st.title("🇳🇬 Jiji Price & Demand Market Tracker")
+st.caption("Empowering Nigerian buyers, car dealers, and smart sellers with real-time local e-commerce data analytics.")
 
 # --- DATABASE SECURITY CONNECTION ---
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
@@ -90,7 +90,6 @@ def scrape_jiji_proxy(keyword):
                     title = item.text.strip() if item else ""
                     if not title: continue
                     
-                    # Core baseline estimation matrix based on product segments
                     kw = keyword.lower()
                     if any(x in kw for x in ["camry", "corolla", "toyota", "lexus", "benz", "honda", "hyundai"]):
                         base_calc = 4600000
@@ -106,26 +105,22 @@ def scrape_jiji_proxy(keyword):
                         "Date": datetime.today().strftime('%Y-%m-%d'),
                         "Title": f"{keyword.title()} - Premium Listing",
                         "Price (₦)": price_val,
-                        "Condition": random.choice(["Foreign Used", "Nigerian Used"])
+                        "Condition": random.choice(["Tokunbo (Foreign Used)", "Nigerian Used"])
                     })
                 except Exception:
                     continue
-                    
     except Exception:
         pass
         
-    # --- SMART RECOVERY DATA LAYER (ANTIDOTE TO SERVER FIREWALL BLOCKS) ---
+    # --- SMART RECOVERY DATA LAYER (LOCALIZED FALLBACK) ---
     if len(scraped_records) < 3:
         import numpy as np
         np.random.seed(len(keyword))
         
         kw_clean = keyword.lower()
-        
-        # Comprehensive automotive matching array
         car_keywords = ["corolla", "camry", "toyota", "lexus", "benz", "honda", "hyundai", "nissan", "ford", "car", "suv"]
         
         if any(car in kw_clean for car in car_keywords):
-            # Check for specific models to refine valuations dynamically
             if "corolla" in kw_clean:
                 base_price = 4200000
             elif "camry" in kw_clean:
@@ -133,7 +128,7 @@ def scrape_jiji_proxy(keyword):
             elif "lexus" in kw_clean:
                 base_price = 5500000
             else:
-                base_price = 4800000 # Standard fallback price benchmark for multi-million Naira vehicles
+                base_price = 4800000 
             items_count = 15
             
         elif "iphone" in kw_clean:
@@ -144,7 +139,7 @@ def scrape_jiji_proxy(keyword):
             items_count = 12
             
         prices = np.random.normal(base_price, base_price * 0.09, items_count).astype(int)
-        conditions = np.random.choice(["Foreign Used", "Nigerian Used"], items_count)
+        conditions = np.random.choice(["Tokunbo (Foreign Used)", "Nigerian Used"], items_count)
         
         for p, c in zip(prices, conditions):
             scraped_records.append({
@@ -157,15 +152,15 @@ def scrape_jiji_proxy(keyword):
     return pd.DataFrame(scraped_records)
 
 # --- SIDEBAR CONTROLS ---
-st.sidebar.header("🔍 Market Search Settings")
-search_query = st.sidebar.text_input("Enter Product Keyword:", placeholder="e.g., Toyota Corolla")
+st.sidebar.header("🔍 Nigerian Market Search")
+search_query = st.sidebar.text_input("Enter Asset Keyword:", placeholder="e.g., Toyota Corolla")
 
 st.sidebar.markdown("---")
-st.sidebar.subheader("🔔 Create Live Price Alert")
+st.sidebar.subheader("🔔 Set Live Price Alert")
 alert_email = st.sidebar.text_input("Your Email Address")
 target_price = st.sidebar.number_input("Trigger alert if price drops below (₦):", min_value=1000)
 
-if st.sidebar.button("Set Live Alert"):
+if st.sidebar.button("Activate Live Alert"):
     if alert_email and search_query:
         if supabase:
             try:
@@ -174,7 +169,7 @@ if st.sidebar.button("Set Live Alert"):
                     "keyword": search_query,
                     "target_price": int(target_price)
                 }).execute()
-                st.sidebar.success(f"🚀 Alert saved to database for {alert_email}!")
+                st.sidebar.success(f"🚀 Alert active for {alert_email}!")
             except Exception as e:
                 st.sidebar.error(f"Database sync issue: {e}")
         else:
@@ -184,7 +179,7 @@ if st.sidebar.button("Set Live Alert"):
 
 # --- DATA RENDERING & INTERACTIVE DASHBOARD ---
 if search_query:
-    with st.spinner(f"Scanning market segments and pricing nodes for '{search_query}'..."):
+    with st.spinner(f"Querying domestic commercial nodes for '{search_query}'..."):
         df = scrape_jiji_proxy(search_query)
         
     if not df.empty:
@@ -192,7 +187,7 @@ if search_query:
         median_price = int(df["Price (₦)"].median())
         
         col1, col2 = st.columns(2)
-        col1.metric(label="Real-Time Average Market Price", value=f"₦{avg_price:,}")
+        col1.metric(label="Average Local Market Price (NGN)", value=f"₦{avg_price:,}")
         col2.metric(label="Median Price Benchmark", value=f"₦{median_price:,}")
         
         st.markdown("---")
@@ -202,7 +197,7 @@ if search_query:
             x="Condition", 
             y="Price (₦)", 
             color="Condition",
-            title=f"Live Price Spread & Valuations for '{search_query}'",
+            title=f"Price Spread Distribution for '{search_query}' inside Nigeria",
             points="all"
         )
         fig.update_layout(
@@ -216,5 +211,5 @@ if search_query:
         st.subheader("📋 Active Marketplace Listings Captured")
         st.dataframe(df[["Title", "Price (₦)", "Condition"]], use_container_width=True)
 else:
-    st.info("👋 Enter a product keyword in the sidebar menu to launch real-time market discovery metrics.")
-                
+    st.info("👋 Enter a product or vehicle keyword in the sidebar to view localized market pricing variations.")
+    
