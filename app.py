@@ -241,7 +241,11 @@ def card_html(item, idx):
     )
 
 def search_jiji(query, category):
-    client = anthropic.Anthropic(api_key=st.secrets["ANTHROPIC_API_KEY"])
+    import os
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise ValueError("ANTHROPIC_API_KEY not set. Go to Render dashboard 2192 Environment 2192 add ANTHROPIC_API_KEY")
+    client = anthropic.Anthropic(api_key=api_key)
     cat_hint = ' in "{}"'.format(category) if category != "All categories" else ""
     prompt = (
         'You are a Nigerian market intelligence analyst. Search Jiji.ng for: "' + query + '"' + cat_hint + '.\n\n'
