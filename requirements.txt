@@ -1,7 +1,2 @@
 streamlit
-pandas
-plotly
-supabase
-psycopg2-binary
-beautifulsoup4
-requests
+anthropic
