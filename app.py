@@ -445,4 +445,140 @@ st.markdown('</div>', unsafe_allow_html=True)
 # trigger
 run_query = query.strip()
 if (go or default_query) and run_query:
-    with st.spinner("Scanning Jiji.ng for {}...".format(run_query)):tr
+    with st.spinner("Scanning Jiji.ng for {}...".format(run_query)):
+        try:
+            data = search_jiji(run_query, category)
+            st.session_state["results"] = data
+            st.session_state["results_label"] = run_query
+            st.session_state["results_time"] = datetime.now().strftime("%I:%M %p")
+            if run_query not in st.session_state["history"]:
+                st.session_state["history"].append(run_query)
+        except Exception as e:
+            st.error("Error: {}".format(e))
+            st.session_state["results"] = None
+
+# ══════════════════════════════════════════════════════════════
+# RESULTS
+# ══════════════════════════════════════════════════════════════
+if st.session_state.get("results"):
+    data = st.session_state["results"]
+    label = st.session_state.get("results_label", "")
+    time_ = st.session_state.get("results_time", "")
+    items = data.get("items", [])
+
+    st.markdown('<div style="max-width:820px;margin:0 auto;padding:0 32px 60px">', unsafe_allow_html=True)
+
+    st.markdown(
+        '<div style="display:flex;align-items:center;justify-content:space-between;'
+        'margin-bottom:20px;flex-wrap:wrap;gap:8px">'
+        '<div>'
+        '<div style="font-size:10px;color:#3D4248;text-transform:uppercase;'
+        'letter-spacing:0.12em;font-weight:600;margin-bottom:4px">Market overview</div>'
+        '<div style="font-size:20px;font-weight:800;color:#FFFFFF;letter-spacing:-0.02em">'
+        + '"' + label + '"'
+        + '</div></div>'
+        '<div style="font-size:11px;color:#3D4248;background:#0D0F12;'
+        'border:1px solid #1A1D22;padding:5px 12px;border-radius:8px">'
+        'Updated ' + time_
+        + '</div></div>',
+        unsafe_allow_html=True,
+    )
+
+    # metrics
+    m1, m2, m3, m4 = st.columns(4)
+    with m1:
+        st.metric("Avg Market Price", ngn(data.get("avgMarketPrice", 0)))
+    with m2:
+        st.metric("Listings Found", "{:,}".format(data.get("totalListings", 0)))
+    with m3:
+        st.metric("Demand Score", "{}/100".format(data.get("overallDemandScore", 0)))
+    with m4:
+        st.metric("Competition", data.get("competitionLevel", "—"))
+
+    st.markdown('<div style="height:14px"></div>', unsafe_allow_html=True)
+
+    # demand bar
+    demand = data.get("overallDemandScore", 0)
+    st.markdown(
+        '<div style="background:#0D0F12;border:1px solid #1A1D22;border-radius:14px;'
+        'padding:16px 20px;margin-bottom:14px">'
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+        '<div style="font-size:12px;font-weight:600;color:#9CA3AF">Overall Market Demand</div>'
+        '<div style="font-size:14px;font-weight:800;color:#00D68F;font-family:monospace">'
+        + str(demand) + '/100'
+        + '</div></div>'
+        '<div style="height:6px;background:#1A1D22;border-radius:4px;overflow:hidden">'
+        '<div style="height:100%;width:' + str(demand) + '%;'
+        'background:linear-gradient(90deg,#00D68F,#00FFAA);border-radius:4px"></div>'
+        '</div></div>',
+        unsafe_allow_html=True,
+    )
+
+    # summary
+    summary = data.get("marketSummary", "")
+    if summary:
+        st.markdown(
+            '<div style="background:linear-gradient(135deg,#0A1520,#08111E);'
+            'border:1px solid #1E3A5F;border-radius:14px;padding:18px 22px;margin-bottom:14px">'
+            '<div style="font-size:10px;color:#3B82F6;text-transform:uppercase;'
+            'letter-spacing:0.1em;font-weight:700;margin-bottom:8px">📋 Market Summary</div>'
+            '<div style="font-size:13.5px;color:#93C5FD;line-height:1.75">' + summary + '</div>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
+    # timing + keywords
+    t1, t2 = st.columns([1, 1])
+    with t1:
+        bts = data.get("bestTimeToSell", "")
+        if bts:
+            st.markdown(
+                '<div style="background:#0A140A;border:1px solid #1A3A1A;'
+                'border-radius:12px;padding:14px 18px">'
+                '<div style="font-size:10px;color:#22C55E;text-transform:uppercase;'
+                'letter-spacing:0.1em;font-weight:700;margin-bottom:8px">⏰ Best time to sell</div>'
+                '<div style="font-size:13px;color:#86EFAC;line-height:1.6">' + bts + '</div>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
+    with t2:
+        kws = data.get("hotKeywords", [])
+        if kws:
+            kw_html = "".join(
+                '<span style="background:#00D68F15;color:#00C47E;padding:5px 12px;'
+                'border-radius:20px;font-size:11px;font-weight:600;'
+                'border:1px solid #00D68F25;display:inline-block;margin:3px">' + k + '</span>'
+                for k in kws
+            )
+            st.markdown(
+                '<div style="background:#0D0F12;border:1px solid #1A1D22;'
+                'border-radius:12px;padding:14px 18px">'
+                '<div style="font-size:10px;color:#4B5563;text-transform:uppercase;'
+                'letter-spacing:0.1em;font-weight:700;margin-bottom:10px">🔍 Trending keywords</div>'
+                '<div>' + kw_html + '</div>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
+
+    st.markdown('<div style="height:20px"></div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div style="font-size:10px;color:#3D4248;text-transform:uppercase;'
+        'letter-spacing:0.12em;font-weight:700;margin-bottom:12px">'
+        + str(len(items)) + ' variants tracked — sorted by demand'
+        + '</div>',
+        unsafe_allow_html=True,
+    )
+
+    sorted_items = sorted(items, key=lambda x: x.get("demandScore", 0), reverse=True)
+    for i, item in enumerate(sorted_items):
+        st.markdown(card_html(item, i), unsafe_allow_html=True)
+
+    st.markdown(
+        '<div style="margin-top:28px;padding:16px;text-align:center;border-top:1px solid #1A1D22">'
+        '<span style="font-size:11px;color:#2A2D32">'
+        'Data sourced from Jiji.ng public listings · For research purposes only · 🇳🇬 JijiTrack'
+        '</span></div>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown('</div>', unsafe_allow_html=True)
